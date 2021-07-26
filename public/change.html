@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>修改</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        body {
+            background-color: rgb(221, 186, 186);
+        }
+
+        input {
+            display: block;
+            width: 200px;
+            line-height: 20px;
+            text-indent: 1em;
+        }
+
+        form {
+            width: 200px;
+            margin: 100px auto;
+            margin-bottom: 20px;
+            background-color: palevioletred;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        button,
+        .btn {
+            display: block;
+            width: 100px;
+            text-align: center;
+            margin: 0 auto;
+            padding: 5px 0;
+            font-weight: bold;
+            color: #fff;
+            background-color: rgb(65, 139, 19);
+            border: none;
+            border-radius: 3px;
+            text-indent: 0;
+        }
+
+        span {
+            font-weight: bold;
+            color: purple;
+        }
+
+        .box {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.3);
+        }
+
+        .box table {
+            background-color: white;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        table th,
+        table td {
+            padding: 5px 10px;
+            text-align: center;
+        }
+
+        .table1 {
+            margin: 50px auto;
+            background-color: white;
+        }
+
+        .td1 {
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- length      返回浏览器历史列表中的URL数量
+        back()      加载 history 列表中的前一个URL
+        forward() 加载 history 列表中的下一个URL
+        go()         加载history列表中的某个具体页面。 -->
+    <!-- <iframe src="javascript:alert(1)" frameborder="0"></iframe> -->
+    <!-- <img src="" onerror="alert(1)"> -->
+    <table align="center" border="1" cellspacing="0" class="table1">
+        <thead>
+            <tr>
+                <th>id</th>
+                <th>用户名</th>
+                <th>邮箱</th>
+                <th>手机号</th>
+                <th>昵称</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <div class="box">
+        <form>
+            <p>用户名<input type="text" name="username" id="username"></p>
+            <p>邮箱<input type="text" name="username" id="email"></p>
+            <p>手机号<input type="text" name="username" id="phone"></p>
+            <p>昵称<input type="text" name="username" id="nick"></p>
+            <input type="button" value="修改" class="btn">
+        </form>
+    </div>
+    <script>
+        // console.log(true == !0);
+        // console.log(0 == []);
+        // console.log("foo" == new function(){return new String("foo");});
+        // (function () {
+        //     var x = foo();
+        //     var foo = function foo() {
+        //         return "foobar"
+        //     };
+        //     console.log(x);          //类型错误
+        // })();
+        // (function () {
+        //     var a = b = 5;
+        // })();
+        // console.log(b);  5
+        // console.log(a);  //a not defind
+
+        // console.log("103" - "1");   //102
+        // let i = 0;
+        // i = new Array(10);
+        // i.forEach((item) => {       //没有item就没有运行次数    0
+        //     a++;
+        // });
+        // let i = parseInt('0xA');         //10
+        // let i = 1+{
+        //     valueOf() { return 9; }
+        // };          //10
+        // console.log(i);
+        (function () {
+            let id;
+            $(".box").hide();
+            data();
+            //更新列表
+            function data() {
+                $.ajax({
+                    url: "http://localhost:3000/change",
+                    type: "post",
+                    success: (data) => {
+                        data.data.forEach(item => {
+                            $(".table1>tbody").append(`
+                        <tr>
+                            <td>${item.id}</td>    
+                            <td>${item.username}</td>    
+                            <td>${item.email}</td>    
+                            <td>${item.phone}</td>    
+                            <td>${item.nick}</td>   
+                            <td class="td1">修改</td>   
+                        </tr>
+                        `)
+                        });
+                    }
+                })
+            }
+            //点击修改事件
+            $(".table1 > tbody").click(function (e) {
+                if ($(e.target).hasClass("td1")) {
+                    $(".box").show();
+                    id = +$(e.target).closest("tr").find("td")[0].innerText;
+                    $.ajax({
+                        url: "http://localhost:3000/change",
+                        type: "post",
+                        data: { id: id },
+                        success: (data) => {
+                            console.log(data);
+                            data.data.forEach(item => {
+                                $("#username").val(item.username);
+                                $("#email").val(item.email);
+                                $("#phone").val(item.phone);
+                                $("#nick").val(item.nick);
+                            });
+                        }
+                    })
+                }
+            })
+            //更新数据库
+            $(".box .btn").click(function () {
+                $.ajax({
+                    url: "http://localhost:3000/has_change",
+                    type: "post",
+                    data: {
+                        id,
+                        new_username: $("#username").val(),
+                        new_email: $("#email").val(),
+                        new_phone: $("#phone").val(),
+                        new_nick: $("#nick").val()
+                    },
+                    success: (res) => {
+                        alert("修改成功！");
+                        $(".table1>tbody").html("");
+                        data();
+                        $(".box").hide();
+                        console.log(res)
+                    }
+                })
+            })
+        })()
+    </script>
+</body>
+
+</html>

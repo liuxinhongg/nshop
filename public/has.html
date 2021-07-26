@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>查看</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        body {
+            background-color: rgb(221, 186, 186);
+        }
+
+        input {
+            display: block;
+            width: 200px;
+            line-height: 20px;
+            text-indent: 1em;
+        }
+
+        form {
+            width: 200px;
+            margin: 100px auto;
+            margin-bottom: 20px;
+            background-color: palevioletred;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        button,
+        .btn {
+            display: block;
+            width: 100px;
+            text-align: center;
+            margin: 0 auto;
+            padding: 5px 0;
+            font-weight: bold;
+            color: #fff;
+            background-color: rgb(65, 139, 19);
+            border: none;
+            border-radius: 3px;
+            text-indent: 0;
+        }
+
+        span {
+            font-weight: bold;
+            color: purple;
+        }
+
+        .box {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.3);
+        }
+
+        .box table {
+            background-color: white;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        table th,
+        table td {
+            padding: 5px 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <form action="" method="">
+        <span>用户名</span><input type="text" id="username" name="username">
+        <span>密码</span><input type="text" id="password" name="password">
+        <!-- <input type="submit" value="查看" class="btn"> -->
+    </form>
+    <button id="btn">查看</button>
+    <div class="box">
+        <table align="center" border="1" cellspacing="0">
+            <thead>
+                <tr>
+                    <th>id</th>
+                    <th>用户名</th>
+                    <th>邮箱</th>
+                    <th>手机号</th>
+                    <th>昵称</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+    <script>
+        (function () {
+            $(".box").hide();
+            $("#btn").click(function () {
+                if ($("#username").val() || $("#password").val()) {
+                    
+                    $.ajax({
+                        url: "http://localhost:3000/has",
+                        data: {
+                            username: $("#username").val(),
+                            password: $("#password").val()
+                        },
+                        type: "post",
+                        success: (data) => {
+                            console.log(data);
+                            if(data.length){
+                                $(".box").show();
+                                $("tbody").append(`
+                                    <tr>
+                                        <td>${data[0].id}</td>
+                                        <td>${data[0].username}</td>
+                                        <td>${data[0].email}</td>
+                                        <td>${data[0].phone}</td>
+                                        <td>${data[0].nick}</td>
+                                    </tr>
+                                `);
+                            }
+                          
+                        }
+                    })
+                }
+            });
+        })()
+    </script>
+</body>
+
+</html>
